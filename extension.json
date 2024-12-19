@@ -1,0 +1,14 @@
+{
+    "builtin": "False",
+    "default_enabled": "True",
+    "type": "extension",
+    "rocket_mode_compatible": "False",
+    "name": "Retro",
+    "description": "Extensions for PyRevit",
+    "author": "Bikbov ILnur",
+    "author_profile": "",
+    "url": "https://github.com/BikbovIR/Retro.git",
+    "website": "",
+    "image": "",
+    "dependencies": []
+}
