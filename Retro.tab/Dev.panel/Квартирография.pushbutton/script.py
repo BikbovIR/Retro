@@ -19,6 +19,11 @@ ADSK_Индекс помещения.
 
 В_Квартиры-02_Заполнение площадей (без Dynamo)_1 знак
 В_Квартиры-02_Заполнение площадей (без Dynamo)_2 знака
+
+------------------------------------------------------------------
+Округление площадей до 2 знаков после запятой
+Коэффициент площади лоджии  = 0.5  
+Коэффициент площади балкона = 0.3   
 ------------------------------------------------------------------
 Author: Bikbov Ilnur"""
 
@@ -29,10 +34,10 @@ Author: Bikbov Ilnur"""
 #---------------------------------------------------------------------
 # Regular + Autodesk
 from pyrevit import script
-import clr
+from Autodesk.Revit import UI
+from Autodesk.Revit import DB
 
-clr.AddReference('RevitServices')
-from RevitServices.Persistence import DocumentManager as DM
+import clr
 
 clr.AddReference('RevitNodes')
 import Revit
@@ -40,22 +45,13 @@ import Revit
 clr.ImportExtensions(Revit.Elements)
 clr.ImportExtensions(Revit.GeometryConversion)
 
-clr.AddReference('RevitAPI')
-from Autodesk.Revit import UI
-from Autodesk.Revit import DB
-
 import sys
 
 sys.path.append("c:/Program Files (x86)/IronPython 2.7/Lib")
+sys.path.append("c:/Program Files/IronPython 2.7/Lib")
 
 import System
 
-clr.AddReference("System.Windows.Forms")
-clr.AddReference("System.Drawing")
-import System.Windows.Forms
-from System.Windows.Forms import Application, Form, StatusBar
-from System.Windows.Forms import ToolBar, ToolBarButton, FolderBrowserDialog
-from System.Windows.Forms import DialogResult
 
 #---------------------------------------------------------------------
 # ╦  ╦╔═╗╦═╗╦╔═╗╔╗ ╦  ╔═╗╔═╗
@@ -63,22 +59,20 @@ from System.Windows.Forms import DialogResult
 #  ╚╝ ╩ ╩╩╚═╩╩ ╩╚═╝╩═╝╚═╝╚═╝ VARIABLES
 #---------------------------------------------------------------------
 doc        = __revit__.ActiveUIDocument.Document
-uiapp      = DM.Instance.CurrentUIApplication
-app        = uiapp.Application
-uidoc      = uiapp.ActiveUIDocument
+app        = __revit__.Application
+
 out = []  # список для вывода промежуточных данных
+
 
 parAptNumber = []  # № КВАРТИРЫ
 parAptTip = []  # Это Тип помещения
 rooms = DB.FilteredElementCollector(doc).OfCategory(DB.BuiltInCategory.OST_Rooms)
-# rooms = FEC(doc).OfCategory(DB.BuiltInCategory.OST_Rooms)
 #---------------------------------------------------------------------
 # ╔╦╗╔═╗╦╔╗╔
 # ║║║╠═╣║║║║
 # ╩ ╩╩ ╩╩╝╚╝ MAIN
 #---------------------------------------------------------------------
 
-# print('В разработке')
 # Получение списков параметров 'ADSK_Номер квартиры' и 'ADSK_Тип помещения''
 
 for room in rooms:
@@ -225,7 +219,7 @@ else:
 
 
 roundCount = 2 # Округление площади
-koefLogia = 0.5  # Коэффициент площади лоджии
+koefLogia  = 0.5  # Коэффициент площади лоджии
 koefBalkon = 0.3  # Коэффициент площади балкона
 
 dict_aparts = {}  # Словарь квартир с помещениями
