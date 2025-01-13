@@ -9,15 +9,19 @@ __doc__ = """Version = 1.0
 Date = 24.12.2024
 -------------------------------------------------------------------------
 Description:
-button made via a lesson https://www.youtube.com/watch?v=B1CJTK-4U8g
-
 Переименовать виды в Ревит используя логику Найти/Заменить
--------------------------------------------------------------------------
+
 Как работает:
 -> Нажать на кнопку
 -> Выбрать виды
 -> Определить правила переименования 
 -> Переименовать виды
+
+
+
+button made via a lesson https://www.youtube.com/watch?v=B1CJTK-4U8g
+-------------------------------------------------------------------------
+
 ----------------------------------------------------------------------
 Last update:
 - 24.12.2024 - 1.0 Release
@@ -33,7 +37,7 @@ __author__ = {                                          #Scripts's Author
 __helpurl__ = 'https://www.google.ru/?hl=ru'            #Link that opens with F1 when hovered over the button
 __min_revit_ver__ = 2021                                #Limit your scripts to certain Revit version
 __max_revit_ver__ = 2023                                #Limit your scripts to certain Revit version
-__highlight__ = 'new'                                   # 'updated' #Add an Orange Marker in Revit UI to Button.
+# __highlight__ = 'new'                                   # 'updated' #Add an Orange Marker in Revit UI to Button.
 #__context__ = ["selection", "active-section-view"]      #Activate Button only: 1. Selection not empty 2. ActiveView:  Selection
 #__context__ = ['Doors', 'Walls', 'Floors']              #Activate Button only if Doors/Wall/Floor selected
 #__context__ = 'doc-project' #'doc-family'               #Activate Button only if Project/Family file
