@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 
 """
-Отзеркаленные окна
-Выделить все экземпляры отзеркаленных окон
-
 SelectMirroredWindows
 Selects All Window Instances that have been Mirrored.
 TESTED REVIT API: 2015 | 2016
@@ -20,10 +17,16 @@ Copyright (c) 2014-2016 Ehsan Iran-Nejad
 pyRevit: repository at https://github.com/eirannejad/pyRevit
 
 """
-#pylint: disable=E0401,W0621,W0631,C0413,C0111,C0103
-__doc__ = "Selects All Window Instances that have been Mirrored."
-__author__ = '@gtalarico'
-__title__ = "Отзеркаленные\nОкна"
+
+#-------------------------------------------------------
+__title__ = "Выделить отзеркаленные\nОкна"
+
+__doc__ = """
+Выделить все отзеркаленные окна в проекте
+
+Selects All Window Instances that have been Mirrored."""
+
+__author__ = "@gtalarico"
 
 from rpw import db, ui
 
