@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 __title__ = "Квартирография"
-
 __doc__ = """Date = 16.12.24
 Перед началом работы задайте значения параметров: 
 ADSK_Тип помещения
@@ -22,8 +21,13 @@ ADSK_Индекс помещения.
 
 ------------------------------------------------------------------
 Округление площадей до 2 знаков после запятой
-Коэффициент площади лоджии  = 0.5  
-Коэффициент площади балкона = 0.3   
+
+Типы помещений:
+"1" - жилое   коэффициент - 1
+"2" - нежилое коэффициент - 1
+"3" - лоджия  коэффициент - 0.5
+"4" - балкон  коэффициент - 0.3
+"5" - общее   коэффициент - 1
 ------------------------------------------------------------------
 Author: Bikbov Ilnur"""
 
@@ -58,15 +62,13 @@ import System
 # ╚╗╔╝╠═╣╠╦╝║╠═╣╠╩╗║  ║╣ ╚═╗
 #  ╚╝ ╩ ╩╩╚═╩╩ ╩╚═╝╩═╝╚═╝╚═╝ VARIABLES
 #---------------------------------------------------------------------
-doc        = __revit__.ActiveUIDocument.Document
-app        = __revit__.Application
-
-out = []  # список для вывода промежуточных данных
+doc          = __revit__.ActiveUIDocument.Document
+app          = __revit__.Application
 
 
 parAptNumber = []  # № КВАРТИРЫ
-parAptTip = []  # Это Тип помещения
-rooms = DB.FilteredElementCollector(doc).OfCategory(DB.BuiltInCategory.OST_Rooms)
+parAptTip    = []  # Это Тип помещения
+rooms        = DB.FilteredElementCollector(doc).OfCategory(DB.BuiltInCategory.OST_Rooms)
 #---------------------------------------------------------------------
 # ╔╦╗╔═╗╦╔╗╔
 # ║║║╠═╣║║║║
@@ -82,11 +84,11 @@ for room in rooms:
 # Проверка заполненности параметров
 
 room_without_AptNumber = []  # квартиры, с незаполненным параметром ADSK_Номер квартиры
-room_with_AptNumber = []  # квартиры, с заполненным параметром ADSK_Номер квартиры
-room_without_AptTip = []  # квартиры, с незаполненным параметром ADSK_Тип помещения
-room_with_AptTip = []  # квартиры, с заполненным параметром ADSK_Тип помещения
+room_with_AptNumber    = []  # квартиры, с заполненным параметром ADSK_Номер квартиры
+room_without_AptTip    = []  # квартиры, с незаполненным параметром ADSK_Тип помещения
+room_with_AptTip       = []  # квартиры, с заполненным параметром ADSK_Тип помещения
 
-count = len(list(rooms))
+count                  = len(list(rooms))
 
 for room, parAptNum, parAptT in zip(rooms, parAptNumber, parAptTip):
     if parAptNum:
@@ -98,7 +100,7 @@ for room, parAptNum, parAptT in zip(rooms, parAptNumber, parAptTip):
     else:
         room_without_AptTip.append(room)
 
-set_rooms_difference = set(room_without_AptTip) - set(room_without_AptNumber)
+set_rooms_difference   = set(room_without_AptTip) - set(room_without_AptNumber)
 set_rooms_intersection = list(set(room_with_AptNumber) & set(room_with_AptTip))
 
 # Вывод окна с сообщением
@@ -252,6 +254,7 @@ if itog_rooms:
             itog_room.GetParameters('ADSK_Коэффициент площади')[0].Set(koefLogia)
         elif apart_tip_room == 4:
             itog_room.GetParameters('ADSK_Коэффициент площади')[0].Set(koefBalkon)
+
 
     # Определение количества жилых комнат
 
