@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__title__ = "Узнать соотношение квартир к общей площади"
+__title__ = "Процент квартир"
 __doc__   = """Version = 1.0
 ----------------------------------------------------------------
 Эту кнопку спросил Паша
@@ -38,19 +38,39 @@ par_MOP =  forms.ask_for_string(
 AllRooms = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Rooms).WhereElementIsNotElementType().ToElements()
 Apartment = 0
 MOP = 0
+#Разделить помещения по вариантам
+variants = {}
 for room in AllRooms:
-    RoomType = room.get_Parameter(BuiltInParameter.ROOM_DEPARTMENT).AsString()
-    Area_ft  = room.Area
-    Area_sqm = UnitUtils.ConvertFromInternalUnits(room.Area, UnitTypeId.SquareMeters)
-    if RoomType == par_apartment:
-        Apartment += Area_sqm
-    elif RoomType == par_MOP:
-        MOP += Area_sqm
-Apartment = round(Apartment,2)
-MOP = round(MOP,2)
-SUM = round(Apartment+MOP,2)
-percentage = round(Apartment/SUM,2)
-print("Площадь квартир: {}        ".format(Apartment))
-print("Площадь МОП: {}        ".format(MOP))
-print("Площадь квартир и МОП: {}        ".format(SUM))
-print("Процент квартир: {}        ".format(Apartment))
+    variant = room.LookupParameter("ADSK_Примечание").AsString()
+    variants[variant] = []
+
+for room in AllRooms:
+    variant = room.LookupParameter("ADSK_Примечание").AsString()
+    variants[variant] = variants[variant]+[room]
+
+#Посчитать по вариантам площадь квартир
+for variant in variants:
+    print(variant)
+    ApArea  = 0
+    MopArea = 0
+    for room in variants[variant]:
+        RoomType = room.get_Parameter(BuiltInParameter.ROOM_DEPARTMENT).AsString()
+        Area_sqm = UnitUtils.ConvertFromInternalUnits(room.Area, UnitTypeId.SquareMeters)
+        if RoomType == par_apartment:
+            ApArea += Area_sqm
+        elif RoomType == par_MOP:
+            MopArea += Area_sqm
+    Apartment = round(Apartment, 2)
+    MOP = round(MOP,2)
+    SUM = round(Apartment+MOP,2)
+    try:
+        percentage = round(Apartment/SUM,2)
+    except:
+        percentage = 0
+    print("Площадь квартир: {}        ".format(Apartment))
+    print("Площадь МОП: {}        ".format(MOP))
+    print("Площадь квартир и МОП: {}        ".format(SUM))
+    if percentage:
+        print("Процент квартир: {}        ".format(Apartment))
+    print('*'*20)
+
