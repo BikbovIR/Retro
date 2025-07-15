@@ -60,17 +60,17 @@ for variant in variants:
             ApArea += Area_sqm
         elif RoomType == par_MOP:
             MopArea += Area_sqm
-    Apartment = round(Apartment, 2)
-    MOP = round(MOP,2)
-    SUM = round(Apartment+MOP,2)
+    ApArea = round(ApArea, 2)
+    MopArea = round(MopArea,2)
+    SUM = round(ApArea+MopArea,2)
     try:
-        percentage = round(Apartment/SUM,2)
+        percentage = (ApArea/SUM)*100
     except:
         percentage = 0
-    print("Площадь квартир: {}        ".format(Apartment))
-    print("Площадь МОП: {}        ".format(MOP))
+    print("Площадь квартир: {}        ".format(ApArea))
+    print("Площадь МОП: {}        ".format(MopArea))
     print("Площадь квартир и МОП: {}        ".format(SUM))
     if percentage:
-        print("Процент квартир: {}        ".format(Apartment))
+        print("Процент квартир: {}        ".format(percentage))
     print('*'*20)
 
