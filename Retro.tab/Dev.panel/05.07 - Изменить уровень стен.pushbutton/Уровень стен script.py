@@ -111,6 +111,11 @@ t.Start()
 #Вычислить новое смещение для стен
 for wall in selected_walls:
     try:
+        #Проверить занят ли элемент кем-то еще
+        checkoutStatus = WorksharingUtils.GetCheckoutStatus(doc,wall.Id)
+        if checkoutStatus == CheckoutStatus.OwnedByOtherUser:
+            print('[{}]Стена занята другим пользователем'.format(wall.Id))
+            continue
         #Получить параметры
         p_base_level  = wall.get_Parameter(BuiltInParameter.WALL_BASE_CONSTRAINT)
         p_base_offset = wall.get_Parameter(BuiltInParameter.WALL_BASE_OFFSET)
