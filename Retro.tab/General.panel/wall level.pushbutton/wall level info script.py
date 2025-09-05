@@ -3,7 +3,7 @@ __title__   = {
     "en_us": "ADSK_Этаж",
     "ru": "ADSK_Этаж"
 }
-__doc__     = """Version = 1.0
+__doc__     = """Version = 1.1
 Date    = 02.09.2025
 ________________________________________________________________
 Заполнить параметр ADSK_Этаж для элемента исходя из имени уровня
@@ -18,7 +18,9 @@ ________________________________________________________________
 
 ________
 Last Updates:
-- [05.09.2025] v1.0 Button was made
+- [02.09.2025] v1.0 Button was made
+- [02.09.2025] v1.1 Added the ability to select the part ot the name that will be used as "ADSK_Этаж"
+
 ________________________________________________________________
 Author: Ilnur Bikbov"""
 
@@ -64,9 +66,23 @@ def ChekIfOwned(el,doc):
 levels = FilteredElementCollector(doc).OfClass(Level).WhereElementIsNotElementType().ToElements()
 dict_levels = sorted([{level.Elevation: [level]} for level in levels])
 
+
 # add the range to levels
 n = 1
 l = len(dict_levels)
+
+#select  part of the name that will indicate the level
+level_name = levels[0].Name.split('_')
+
+forms.ask_for_one_item(
+    level_name,
+    default= level_name[1],
+    prompt='Какая часть имени уровня будет означать его этажность :',
+    title= 'Что записать в параметр "ADSK_Этаж"?'
+)
+
+
+
 for d_l in dict_levels:
     Splitted_Name = d_l.values()[0][0].Name.split('_')[1]
     # print(Splitted_Name)
@@ -101,14 +117,17 @@ res = forms.SelectFromList.show(options,
                                 group_selector_title='Sheet Sets',
                                 button_name='Жмяк')
 #check if user selected anything
-el_to_set_par = []
-for cat in res:
-    el_to_set_par.extend(dic_options[cat])
-
-if el_to_set_par:
+if res:
     pass
 else:
     forms.alert("Не выбраны элементы \nпопробуйте еще раз", exitscript=True)
+
+el_to_set_par = []
+
+for cat in res:
+    el_to_set_par.extend(dic_options[cat])
+
+
 
 #lists for unchanged elements
 intact_elements = []
