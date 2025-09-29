@@ -3,7 +3,7 @@ __title__   = {
     "en_us": "ADSK_Этаж",
     "ru": "ADSK_Этаж"
 }
-__doc__     = """Version = 1.1
+__doc__     = """Version = 1.2
 Date    = 02.09.2025
 ________________________________________________________________
 Заполнить параметр ADSK_Этаж для элемента исходя из имени уровня
@@ -20,9 +20,12 @@ ________
 Last Updates:
 - [02.09.2025] v1.0 Button was made
 - [02.09.2025] v1.1 Added the ability to select the part ot the name that will be used as "ADSK_Этаж"
+- [29.09.2025] v1.2 Added the categories: GenericModels, Areas.
 
 ________________________________________________________________
 Author: Ilnur Bikbov"""
+
+import sys
 
 import Autodesk.Revit.DB
 # ╦╔╦╗╔═╗╔═╗╦═╗╔╦╗╔═╗
@@ -100,15 +103,18 @@ for d_l in dict_levels:
 
 
 #get all elements
-AllWalls   = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Walls).WhereElementIsNotElementType().ToElements()
-AllWindows = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Windows).WhereElementIsNotElementType().ToElements()
-AllDoors   = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Doors).WhereElementIsNotElementType().ToElements()
-AllFloors  = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Floors).WhereElementIsNotElementType().ToElements()
-AllRooms   = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Rooms).WhereElementIsNotElementType().ToElements()
+AllWalls           = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Walls).WhereElementIsNotElementType().ToElements()
+AllWindows         = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Windows).WhereElementIsNotElementType().ToElements()
+AllDoors           = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Doors).WhereElementIsNotElementType().ToElements()
+AllFloors          = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Floors).WhereElementIsNotElementType().ToElements()
+AllRooms           = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Rooms).WhereElementIsNotElementType().ToElements()
+AllGenericModels   = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_GenericModel).WhereElementIsNotElementType().ToElements()
+AllZones           = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Areas).WhereElementIsNotElementType().ToElements()
 
 #get dictionary that user can select
-dic_options = {'Стены':AllWalls,'Окна':AllWindows,'Двери':AllDoors,'Перекрытия':AllFloors,'Помещения':AllRooms}
-options = ['Стены','Окна','Двери','Перекрытия','Помещения']
+dic_options = {'Стены':AllWalls,'Окна':AllWindows,'Двери':AllDoors,'Перекрытия':AllFloors,
+               'Помещения':AllRooms, 'Обобщенные модели':AllGenericModels, 'Зоны': AllZones}
+options = ['Стены','Окна','Двери','Перекрытия','Помещения','Обобщенные модели', 'Зоны']
 
 
 res = forms.SelectFromList.show(options,
@@ -128,37 +134,40 @@ for cat in res:
     el_to_set_par.extend(dic_options[cat])
 
 
-
 #lists for unchanged elements
 intact_elements = []
 elem_notOwned   = []
 #variable for counting changes
 changes = 0
-#Transaction
-with Transaction(doc,'PyRevit заполнил параметр "ADSK_Этаж"') as t:
-    t.Start()
-    for element in el_to_set_par:
-        BBox = element.get_BoundingBox(None)
-        MiddlePoint = (BBox.Max.Z+BBox.Min.Z)/2
-        element_ADSK_level_p = element.LookupParameter("ADSK_Этаж")
-        for level in dict_levels:
-            l_MIN  = level.values()[0][1]
-            l_MAX  = level.values()[0][2]
-            l_Name = level.values()[0][3]
-            if MiddlePoint > l_MIN:
-                if MiddlePoint < l_MAX:
-                    if ChekIfOwned(element,doc):
-                        try:
-                            element_ADSK_level_p.Set(l_Name)
-                            changes += 1
-                        except:
-                            intact_elements.append(element)
-                            # print('DID NOT SET_element {}_id: {}_ on {} level'.format(element.Name,element.Id, l_Name))
-                    else:
-                        elem_notOwned.append(element)
-                        # print('Element is not Owned by user: {}_id: {}_ on {} level'.format(element.Name, element.Id, l_Name))
-    t.Commit()
 
+#Transaction
+t = Transaction(doc,'PyRevit заполнил параметр "ADSK_Этаж"')
+
+t.Start()
+for element in el_to_set_par:
+    element_ADSK_level_p = element.LookupParameter("ADSK_Этаж")
+    if element.Category.BuiltInCategory == BuiltInCategory.OST_Areas:
+        middle_point = element.Location.Point.Z
+    else:
+        BBox = element.get_BoundingBox(None)
+        middle_point = (BBox.Max.Z+BBox.Min.Z)/2
+    for level in dict_levels:
+        l_MIN  = level.values()[0][1]
+        l_MAX  = level.values()[0][2]
+        l_Name = level.values()[0][3]
+        is_in_range = l_MIN <= middle_point < l_MAX
+        if is_in_range:
+            if ChekIfOwned(element,doc):
+                try:
+                    element_ADSK_level_p.Set(l_Name)
+                    changes += 1
+                except:
+                    intact_elements.append(element)
+                    # print('DID NOT SET_element {}_id: {}_ on {} level'.format(element.Name,element.Id, l_Name))
+            else:
+                elem_notOwned.append(element)
+                # print('Element is not Owned by user: {}_id: {}_ on {} level'.format(element.Name, element.Id, l_Name))
+t.Commit()
 #Show to the user what elements wasn't changed
 if intact_elements:
     print('Элементам ниже не были заданы параметры:')
