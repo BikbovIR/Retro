@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-__title__ = "Квартирография 3.0"
+__title__ = "Квартирография 3.1"
 __doc__ = """
-Date = 21.10.2025
+Date = 27.10.2025
 _________________________________________________________________
 Перед началом работы задайте значения параметров: 
 ADSK_Тип помещения
@@ -16,6 +16,8 @@ ADSK_Коэффициент площади
 ADSK_Площадь с коэффициентом
 ADSK_Индекс помещения
 RETRO_Площадь квартиры общая без коэф
+
+Дополнительно прописывается параметр 'RETRO_Площадь помещения' для всех помещений в проекте
 _________________________________________________________________
 Округление площадей до 2 знаков после запятой
 
@@ -57,6 +59,7 @@ p_name_koef                     = 'ADSK_Коэффициент площади'  
 p_name_AreaWithKoef             = 'ADSK_Площадь с коэффициентом'                #- Площадь помещения с коэффициентом
 p_name_RoomIndex                = 'ADSK_Индекс помещения'                       #- Индекс помещения (Номер квартиры+Тип помещения)
 p_name_TotalAreaWithoutKoef     = 'RETRO_Площадь квартиры общая без коэф'       #- Сумма всех помещений без коэффициента
+p_name_RetroArea                = 'RETRO_Площадь помещения'                     #- Параметр площади если надо складывать параметр площади в спеке
 
 koef_balkony = 0.3
 koef_loggia  = 0.5
@@ -81,6 +84,7 @@ for room in all_rooms:
 from collections import defaultdict
 dict_rooms = defaultdict(list)
 
+
 for room in all_rooms:
     try:
         apartment_num = room.LookupParameter(p_name_room_sorting).AsString()
@@ -95,6 +99,21 @@ for room in all_rooms:
 
 t = Transaction(doc, 'Sum Apartments')
 t.Start()
+
+#Exta step - Write existed area but rounded
+for extra_room in all_rooms:
+    try:
+        extra_room_area_m2      = UnitUtils.ConvertFromInternalUnits(room.Area, UnitTypeId.SquareMeters)
+        extra_area_m2_rounded   = round(extra_room_area_m2, 2)
+        extra_area_ft           = UnitUtils.ConvertToInternalUnits(extra_area_m2_rounded,UnitTypeId.SquareMeters)
+        p_RetroArea             = room.LookupParameter(p_name_RetroArea)
+        p_RetroArea.Set(extra_area_ft)
+
+    except:
+        forms.alert("Не нашел параметр 'RETRO_Площадь помещения'")
+        break
+
+
 
 for apartment_num, rooms in dict_rooms.items():
     sum_LivingRoom_m2           = 0 #- Сумма жилых помещений квартиры
