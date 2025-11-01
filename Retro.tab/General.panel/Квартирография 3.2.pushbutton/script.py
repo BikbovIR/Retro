@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__title__ = "Квартирография 3.1"
+__title__ = "Квартирография 3.2"
 __doc__ = """
 Date = 27.10.2025
 _________________________________________________________________
@@ -110,10 +110,10 @@ for extra_room in all_rooms:
         p_RetroArea.Set(extra_area_ft)
 
     except:
-        forms.alert("Не нашел параметр 'RETRO_Площадь помещения'")
+        forms.alert("Не нашелся параметр 'RETRO_Площадь помещения'\nСкрипт продолжит работу, без заполнения этого параметра")
         break
 
-
+room_tables =[]
 
 for apartment_num, rooms in dict_rooms.items():
     sum_LivingRoom_m2           = 0 #- Сумма жилых помещений квартиры
@@ -167,18 +167,19 @@ for apartment_num, rooms in dict_rooms.items():
         except:
             forms.alert("Не нашел какие-то параметры. проверьте их наличие всех параметров", exitscript=True)
     # Preview Results
-    print('Номер квартиры: {}'.format(apartment_num))
-    print('Количество комнат: {}'.format(NumberOfRooms))
-    print('Жилая площадь квартиры: {}'.format(sum_LivingRoom_m2))
-    print('Общая площадь квартиры: {}'.format(sum_TotalArea_m2))
-    print('Общая площадь квартиры без коэф.: {}'.format(sum_TotalAreaWithoutKoef_m2))
-    print('---')
+    # print('Номер квартиры: {}'.format(apartment_num))
+    # print('Количество комнат: {}'.format(NumberOfRooms))
+    # print('Жилая площадь квартиры: {}'.format(sum_LivingRoom_m2))
+    # print('Общая площадь квартиры: {}'.format(sum_TotalArea_m2))
+    # print('Общая площадь квартиры без коэф.: {}'.format(sum_TotalAreaWithoutKoef_m2))
+    # print('---')
     # Converting M2 to FT
     sum_LivingRoom_ft           = UnitUtils.ConvertToInternalUnits(sum_LivingRoom_m2,          UnitTypeId.SquareMeters)
     sum_ApartmentArea_ft        = UnitUtils.ConvertToInternalUnits(sum_ApartmentArea_m2,       UnitTypeId.SquareMeters)
     sum_TotalArea_ft            = UnitUtils.ConvertToInternalUnits(sum_TotalArea_m2,           UnitTypeId.SquareMeters)
     sum_TotalAreaWithoutKoef_ft = UnitUtils.ConvertToInternalUnits(sum_TotalAreaWithoutKoef_m2,UnitTypeId.SquareMeters)
 
+    room_tables.append([apartment_num,NumberOfRooms,sum_LivingRoom_m2,sum_TotalArea_m2,sum_TotalAreaWithoutKoef_m2])
 
     # 4. Write Results to Output Parameter
     for room in rooms:
@@ -198,3 +199,18 @@ for apartment_num, rooms in dict_rooms.items():
         except:
             forms.alert("Не нашел какие-то параметры. проверьте их наличие всех параметров", exitscript=True)
 t.Commit()
+
+from pyrevit import script
+
+output = script.get_output()
+
+data = [
+['row1', 'data', 'data', 80 ],
+['row2', 'data', 'data', 45 ],
+]
+output.print_table(
+table_data=room_tables,
+title= "️Готово  👌️",
+columns=["Номер квартиры", "Количество комнат", "Жилая площадь квартиры", "Общая площадь квартиры","Общая площадь квартиры без коэф"],
+formats=['', '', '', ''],
+last_line_style='color:green;')
