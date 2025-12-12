@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 __title__   = {
-    "en_us": "ADSK_Этаж",
-    "ru": "ADSK_Этаж"
+    "en_us": "ADSK_Level",
+    "ru": "ADSK_Level"
 }
-__doc__     = """Version = 1.2
-Date    = 02.09.2025
+__doc__     = """Version = 1.3
+Date    = 12.12.2025
 ________________________________________________________________
 Заполнить параметр ADSK_Этаж для элемента исходя из имени уровня
 
@@ -21,6 +21,8 @@ Last Updates:
 - [02.09.2025] v1.0 Button was made
 - [02.09.2025] v1.1 Added the ability to select the part ot the name that will be used as "ADSK_Этаж"
 - [29.09.2025] v1.2 Added the categories: GenericModels, Areas.
+- [12.12.2025] v1.3 Added the categories: AllMechanicalEquipment.
+
 
 ________________________________________________________________
 Author: Ilnur Bikbov"""
@@ -103,18 +105,19 @@ for d_l in dict_levels:
 
 
 #get all elements
-AllWalls           = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Walls).WhereElementIsNotElementType().ToElements()
-AllWindows         = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Windows).WhereElementIsNotElementType().ToElements()
-AllDoors           = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Doors).WhereElementIsNotElementType().ToElements()
-AllFloors          = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Floors).WhereElementIsNotElementType().ToElements()
-AllRooms           = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Rooms).WhereElementIsNotElementType().ToElements()
-AllGenericModels   = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_GenericModel).WhereElementIsNotElementType().ToElements()
-AllZones           = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Areas).WhereElementIsNotElementType().ToElements()
+AllWalls                = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Walls).WhereElementIsNotElementType().ToElements()
+AllWindows              = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Windows).WhereElementIsNotElementType().ToElements()
+AllDoors                = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Doors).WhereElementIsNotElementType().ToElements()
+AllFloors               = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Floors).WhereElementIsNotElementType().ToElements()
+AllRooms                = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Rooms).WhereElementIsNotElementType().ToElements()
+AllGenericModels        = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_GenericModel).WhereElementIsNotElementType().ToElements()
+AllZones                = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Areas).WhereElementIsNotElementType().ToElements()
+AllMechanicalEquipment  = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_MechanicalEquipment).WhereElementIsNotElementType().ToElements()
 
 #get dictionary that user can select
 dic_options = {'Стены':AllWalls,'Окна':AllWindows,'Двери':AllDoors,'Перекрытия':AllFloors,
-               'Помещения':AllRooms, 'Обобщенные модели':AllGenericModels, 'Зоны': AllZones}
-options = ['Стены','Окна','Двери','Перекрытия','Помещения','Обобщенные модели', 'Зоны']
+               'Помещения':AllRooms, 'Обобщенные модели':AllGenericModels, 'Зоны': AllZones,'Оборудование': AllMechanicalEquipment}
+options = list(dic_options.keys())
 
 
 res = forms.SelectFromList.show(options,

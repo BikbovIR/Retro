@@ -156,7 +156,8 @@ for apartment_num, rooms in dict_rooms.items():
         AreaWithKoef_m2              = AreaWithKoef_m2_decimal.quantize(Decimal('0.01'),rounding=ROUND_HALF_UP)
         RoomIndex                    = str(apartment_num) + '_' + str(room_type)
         sum_TotalAreaWithoutKoef_m2 += room_area_m2_rounded
-        Retro_area_m2                = room_area_m2_rounded*Retro_Koef
+        Retro_area_decimal           = room_area_m2_rounded*Retro_Koef
+        Retro_area_m2                = Retro_area_decimal.quantize(Decimal("0.01"),rounding=ROUND_HALF_UP)
 
 
         if room_type == 1:
