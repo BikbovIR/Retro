@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__title__ = "Квартирография Железняк 2.0"
+__title__ = "Квартирография Железняк 2.1"
 __doc__ = """
 Date = 25.11.2025
 _________________________________________________________________
@@ -192,7 +192,7 @@ for apartment_num, rooms in dict_rooms.items():
             p_koef.Set(float(Room_koef))
             p_AreaWithKoef.Set(AreaWithKoef_ft)
             p_RoomIndex.Set(RoomIndex)
-            p_RetroKoef.Set(Koef)
+            p_RetroKoef.Set(float(Koef))
             p_RetroArea.Set(Retro_area_ft)
 
         except:
