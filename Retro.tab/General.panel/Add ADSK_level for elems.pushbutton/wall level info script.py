@@ -3,7 +3,7 @@ __title__   = {
     "en_us": "ADSK_Level",
     "ru": "ADSK_Level"
 }
-__doc__     = """Version = 1.4
+__doc__     = """Version = 1.5
 Date    = 21.01.2026
 ________________________________________________________________
 Заполнить параметр ADSK_Этаж для элемента исходя из имени уровня
@@ -23,6 +23,7 @@ Last Updates:
 - [29.09.2025] v1.2 Added the categories: GenericModels, Areas.
 - [12.12.2025] v1.3 Added the categories: AllMechanicalEquipment.
 - [21.01.2026] v1.4 Added the categories: AllCeilings.
+- [21.01.2026] v1.5 Added sub-transactions to avoid crashes.
 
 
 ________________________________________________________________
@@ -151,28 +152,36 @@ t = Transaction(doc,'PyRevit заполнил параметр "ADSK_Этаж"')
 
 t.Start()
 for element in el_to_set_par:
+    st1 = SubTransaction(doc)
+    st1.Start()
     element_ADSK_level_p = element.LookupParameter("ADSK_Этаж")
-    if element.Category.BuiltInCategory == BuiltInCategory.OST_Areas:
-        middle_point = element.Location.Point.Z
-    else:
-        BBox = element.get_BoundingBox(None)
-        middle_point = (BBox.Max.Z+BBox.Min.Z)/2
-    for level in dict_levels:
-        l_MIN  = level.values()[0][1]
-        l_MAX  = level.values()[0][2]
-        l_Name = level.values()[0][3]
-        is_in_range = l_MIN <= middle_point < l_MAX
-        if is_in_range:
-            if ChekIfOwned(element,doc):
-                try:
-                    element_ADSK_level_p.Set(l_Name)
-                    changes += 1
-                except:
-                    intact_elements.append(element)
-                    # print('DID NOT SET_element {}_id: {}_ on {} level'.format(element.Name,element.Id, l_Name))
-            else:
-                elem_notOwned.append(element)
-                # print('Element is not Owned by user: {}_id: {}_ on {} level'.format(element.Name, element.Id, l_Name))
+    try:
+        if element.Category.BuiltInCategory == BuiltInCategory.OST_Areas:
+            middle_point = element.Location.Point.Z
+        else:
+            BBox = element.get_BoundingBox(None)
+            middle_point = (BBox.Max.Z+BBox.Min.Z)/2
+        for level in dict_levels:
+            l_MIN  = level.values()[0][1]
+            l_MAX  = level.values()[0][2]
+            l_Name = level.values()[0][3]
+            is_in_range = l_MIN <= middle_point < l_MAX
+            if is_in_range:
+                if ChekIfOwned(element,doc):
+                    try:
+                        element_ADSK_level_p.Set(l_Name)
+                        changes += 1
+                    except:
+                        intact_elements.append(element)
+                        # print('DID NOT SET_element {}_id: {}_ on {} level'.format(element.Name,element.Id, l_Name))
+                else:
+                    elem_notOwned.append(element)
+                    # print('Element is not Owned by user: {}_id: {}_ on {} level'.format(element.Name, element.Id, l_Name))
+    except:
+        st1.RollBack()
+        intact_elements.append(element)
+        continue
+    st1.Commit()
 t.Commit()
 #Show to the user what elements wasn't changed
 if intact_elements:
