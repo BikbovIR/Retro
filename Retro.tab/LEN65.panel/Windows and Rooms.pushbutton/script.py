@@ -32,11 +32,20 @@ app   = __revit__.Application
 p_name_window_area              = 'Площадь вырезания стены'                     # Параметр окна показывает площадь вырезания из стены
 p_name_RetroArea                = 'RETRO_Площадь помещения'                     #- Параметр площади если надо складывать параметр площади в спеке
 phase = doc.Phases[doc.Phases.Size - 1]
+#Functions
+
+#Получить площадь -> перевести в метрическую систему -> округлить до 2 десятых -> перевести в футы
+def RoundingFunction(area):
+    room_area_m2 = UnitUtils.ConvertFromInternalUnits(area, UnitTypeId.SquareMeters)
+    room_area_m2_rounded = round(room_area_m2, 2)
+    room_area_ft = UnitUtils.ConvertToInternalUnits(room_area_m2_rounded, UnitTypeId.SquareMeters)
+    return room_area_ft
 
 # ╔╦╗╔═╗╦╔╗╔
 # ║║║╠═╣║║║║
 # ╩ ╩╩ ╩╩╝╚╝ MAIN
 # ==================================================
+
 
 # 1. Получить все помещения
 all_rooms = (FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Rooms).WhereElementIsNotElementType().ToElements())
@@ -73,6 +82,12 @@ for window in all_windows:
     window_area = window_instance_par.AsDouble()
     rooms_dict[room_id] += window_area
 
+#5 Округлить значения до 2 десятых
+for room in all_rooms:
+    room_id = room.Id.IntegerValue
+    # print("Было: {}ft").format(rooms_dict[room_id])
+    rooms_dict[room_id] = RoundingFunction (rooms_dict[room_id])
+    # print("Стало: {}ft").format(rooms_dict[room_id])
 
 # #Внести изменения в ревит
 t = Transaction(doc, "Window areas add to Rooms")
