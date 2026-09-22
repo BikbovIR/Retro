@@ -2,7 +2,7 @@
 __title__ = "LEN65_Квартирография"
 __title__ = "LEN65_Rooms Sum"
 __doc__ = """
-Date = 14.09.2026
+Date = 22.09.2026
 _________________________________________________________________
 Перед началом работы задайте значения параметров: 
 1. Прогнать функцию Windows extend Rooms
@@ -192,6 +192,11 @@ for apartment_num, rooms in dict_rooms.items():
 
 
 t.Commit()
+
+#Проверить есть ли квартиры
+if not room_tables:
+    forms.alert("Список квартир пуст".format(p_name_room_sorting),
+                exitscript=True)
 
 from pyrevit import script
 
